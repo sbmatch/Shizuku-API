@@ -43,7 +43,8 @@ public class SystemServiceHelper {
         if (binder == null) {
             try {
                 binder = (IBinder) getService.invoke(null, name);
-            } catch (IllegalAccessException | InvocationTargetException e) {
+                if (binder == null) binder = Shizuku.requireService().getSystemService(name);
+            } catch (Exception e) {
                 Log.w("SystemServiceHelper", Log.getStackTraceString(e));
             }
             SYSTEM_SERVICE_CACHE.put(name, binder);
