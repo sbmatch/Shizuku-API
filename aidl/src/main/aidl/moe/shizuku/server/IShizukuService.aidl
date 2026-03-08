@@ -48,6 +48,4 @@ interface IShizukuService {
     void updateFlagsForUid(int uid, int mask, int value) = 106;
 
     IBinder getSystemService(in String name) = 107;
-
-    void test(in String text, in IRemoteCallback callback) = 108;
  }
