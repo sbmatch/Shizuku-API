@@ -3,6 +3,7 @@ package rikka.shizuku;
 import android.annotation.SuppressLint;
 import android.os.IBinder;
 import android.os.Parcel;
+import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -38,17 +39,22 @@ public class SystemServiceHelper {
      * @param name the name of the service to get such as "package" for android.content.pm.IPackageManager
      * @return a reference to the service, or <code>null</code> if the service doesn't exist
      */
-    public static IBinder getSystemService(@NonNull String name) {
-        IBinder binder = SYSTEM_SERVICE_CACHE.get(name);
+    public static IBinder getSystemService(@NonNull String name, boolean withPrivilege) {
+        IBinder binder = SYSTEM_SERVICE_CACHE.get(name+"_#"+withPrivilege);
         if (binder == null) {
             try {
-                binder = Shizuku.requireService().getSystemService(name);
-            } catch (Exception e) {
-                Log.w("SystemServiceHelper", Log.getStackTraceString(e));
+                binder = withPrivilege ? Shizuku.requireService().getSystemService(name): (IBinder) getService.invoke(null, name);
+            }catch (Throwable e) {
+                Log.e("SystemServiceHelper", Log.getStackTraceString(e));
+                return null;
             }
-            SYSTEM_SERVICE_CACHE.put(name, binder);
+            SYSTEM_SERVICE_CACHE.put(name+"_#"+withPrivilege, binder);
         }
         return binder;
+    }
+
+    public static IBinder getSystemService(@NonNull String name){
+        return getSystemService(name, false);
     }
 
     /**
